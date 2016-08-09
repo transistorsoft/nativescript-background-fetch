@@ -2,18 +2,19 @@
 	"name": "nativescript-background-fetch",
 	"version": "0.0.1",
 	"description": "iOS Background Fetch API Implementation for NativeScript",
-	"main": "backround-fetch.js",
+	"main": "background-fetch.js",
 	"nativescript": {
 		"platforms": {
-      			"ios": "2.0.0"
+      "ios": "2.1.1"
 		}
 	},
 	"scripts": {
 		"build": "tsc",
     "demo.ios": "npm run preparedemo && cd demo && tns emulate ios",
 		"demo.android": "npm run preparedemo && cd demo && tns run android",
-		"preparedemo": "npm run build && cd demo && tns plugin remove nativescript-yourplugin && tns plugin add .. && tns install",
-		"setup": "cd demo && npm install && cd .. && npm run build && cd demo && tns plugin add .. && cd .."
+		"preparedemo": "npm run build && cd demo && tns plugin remove nativescript-background-fetch && tns plugin add .. && tns install",
+		"setup": "cd demo && npm install && cd .. && npm run build && cd demo && tns plugin add .. && cd ..",
+    "uninstall": "rm -r ../../lib/iOS/TSBackgroundFetch.framework"
 	},
 	"repository": {
 		"type": "git",
@@ -32,10 +33,7 @@
 	"bugs": {
 		"url": "https://github.com/transistorsoft/nativescript-background-fetch/issues"
 	},
-	"license": {
-		"type": "MIT",
-		"url": "https://github.com/transistorsoft/nativescript-background-fetch/blob/master/LICENSE"
-	},
+	"license": "MIT",
 	"homepage": "https://github.com/transistorsoft/nativescript-background-fetch",
 	"readmeFilename": "README.md",
 	"devDependencies": {

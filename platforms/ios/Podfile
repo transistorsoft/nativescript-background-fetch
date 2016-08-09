@@ -1,0 +1,1 @@
+pod 'nativescript-background-fetch', :path => '../../node_modules/nativescript-background-fetch/platforms/ios'

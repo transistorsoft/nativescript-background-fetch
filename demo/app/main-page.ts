@@ -1,10 +1,10 @@
-import * as observable from 'data/observable';
-import * as pages from 'ui/page';
-import {HelloWorldModel} from './main-view-model';
+import { EventData } from "data/observable";
+import { Page } from "ui/page";
+import { HelloWorldModel } from "./main-view-model";
 
-// Event handler for Page "loaded" event attached in main-page.xml
-export function pageLoaded(args: observable.EventData) {
+// Event handler for Page "navigatingTo" event attached in main-page.xml
+export function navigatingTo(args: EventData) {
     // Get the event sender
-    var page = <pages.Page>args.object;
+    var page = <Page>args.object;
     page.bindingContext = new HelloWorldModel();
 }
