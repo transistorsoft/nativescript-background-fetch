@@ -7,25 +7,33 @@ iOS Background Fetch is basically an API which wakes up your app about every 15 
 
 [Tutorial](http://www.doubleencore.com/2013/09/ios-7-background-fetch/)
 
-Follows the [Cordova Plugin spec](https://github.com/apache/cordova-plugman/blob/master/plugin_spec.md), so that it works with [Plugman](https://github.com/apache/cordova-plugman).
-
-This plugin leverages Cordova/PhoneGap's [require/define functionality used for plugins](http://simonmacdonald.blogspot.ca/2012/08/so-you-wanna-write-phonegap-200-android.html). 
-
-## Using the plugin ##
-The plugin creates the object `window.BackgroundFetch` with the methods `configure(success, fail, option)`, `start(success, fail)` and `stop(success, fail)`. 
-
 ## Installing the plugin ##
 
-### Command Line
-
 ```Bash
-   $ cordova plugin add cordova-plugin-background-fetch
+   $ tns plugin add nativescript-background-fetch
 ```
 
-### PhoneGap Build
+## Setup
 
-```Bash
-  <plugin name="cordova-plugin-background-fetch source="npm" />
+BackgroundFetch requires implementation of the `AppDelegate` method `applicationPerformFetchWithCompletionHandler` in the `AppDelegate`.  In your `app.ts`, add the following block (If you've already implemented an `AppDelegate`, simply add the method `applicationPerformFetchWithCompletionHandler` to your existing implementation).
+
+**`app.ts`**
+```Javascript
+import application = require("application");
+
+if (application.ios) {
+  class MyDelegate extends UIResponder {
+    public static ObjCProtocols = [UIApplicationDelegate];
+
+      // BackgroundFetch delegate method
+      public applicationPerformFetchWithCompletionHandler(application: UIApplication, completionHandler:any) {
+        TSBackgroundFetch.sharedInstance().performFetchWithCompletionHandler(completionHandler);
+      }
+    }
+    application.ios.delegate = MyDelegate;
+}    
+
+application.start({ moduleName: "main-page" });
 ```
 
 ## Config 
@@ -47,30 +55,28 @@ Set `true` to cease background-fetch from operating after user "closes" the app.
 
 A full example could be:
 ```Javascript
-   onDeviceReady: function() {
-        var Fetcher = window.BackgroundFetch;
-        
-        // Your background-fetch handler.
-        var fetchCallback = function() {
-            console.log('[js] BackgroundFetch initiated');
 
-            // perform some ajax request to server here
-            $.get({
-                url: '/heartbeat.json',
-                callback: function(response) {
-                    // process your response and whatnot.
+import {BackgroundFetch} from "nativescript-background-fetch";
 
-                    Fetcher.finish();   // <-- N.B. You MUST called #finish so that native-side can signal completion of the background-thread to the os.
-                }
-            });
-        }
-        var failureCallback = function(error) {
-            console.log('- BackgroundFetch failed', error);
-        };
-        Fetcher.configure(fetchCallback, failureCallback, {
-            stopOnTerminate: false  // <-- true is default
-        });
-    }
+export class HelloWorldModel
+  private _fetchManager: BackgroundFetch;
+
+  constructor() {
+    this._fetchManager = new BackgroundFetch();  
+    this._fetchManager.configure({
+      stopOnTerminate: false
+    }, function() {
+      console.log("[js] BackgroundFetch event received");
+      //
+      // Do stuff.  You have 30s of background-time.
+      //
+      // When your job is complete, you must signal completion or iOS can kill your app.
+      this._fetchManager.finish();
+    }.bind(this), function(error) {
+      console.log('BackgroundFetch not supported by your OS');
+    });
+  }
+}
 ```
 
 ## iOS
