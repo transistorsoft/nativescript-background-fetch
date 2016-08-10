@@ -15,7 +15,7 @@ iOS Background Fetch is basically an API which wakes up your app about every 15 
 
 ## Setup
 
-BackgroundFetch requires implementation of the `AppDelegate` method `applicationPerformFetchWithCompletionHandler` in the `AppDelegate`.  In your `app.ts`, add the following block (If you've already implemented an `AppDelegate`, simply add the method `applicationPerformFetchWithCompletionHandler` to your existing implementation).
+BackgroundFetch requires implementation of the **`AppDelegate`** method **`applicationPerformFetchWithCompletionHandler`**.  In your **`app.ts`**, add the following block (If you've already implemented an **`AppDelegate`**, simply add the method `applicationPerformFetchWithCompletionHandler` to your existing implementation).
 
 **`app.ts`**
 ```Javascript
