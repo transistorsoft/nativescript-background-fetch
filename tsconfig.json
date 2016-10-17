@@ -13,7 +13,8 @@
     },
     "files": [
         "demo/node_modules/tns-core-modules/tns-core-modules.d.ts",
-        "background-fetch.ios.ts"
+        "background-fetch.ios.ts",
+	"background-fetch.android.ts"
     ],
     "exclude": [
         "node_modules",
