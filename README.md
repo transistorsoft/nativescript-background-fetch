@@ -89,6 +89,9 @@ import {BackgroundFetch} from "nativescript-background-fetch";
 
 export class HelloWorldModel
   constructor() {
+    super();
+
+    // Configure Background Fetch
     BackgroundFetch.configure({
       stopOnTerminate: false
     }, function() {
@@ -106,14 +109,16 @@ export class HelloWorldModel
     });
 
     // Later, to stop background-fetch events from firing:
-    BackgroundFetch.stop();
+    //BackgroundFetch.stop();
 
     // Or restart them again:
+    /*
     BackgroundFetch.start(function() {
       console.log("BackgroundFetch successfully started");
     }, function() {
       console.log("BackgroundFetch failed to start");
     });
+    */
   }
 }
 ```
