@@ -20,21 +20,20 @@ BackgroundFetch requires implementation of the **`AppDelegate`** method **`appli
 **`app.ts`**
 ```diff
 import application = require("application");
+import {BackgroundFetch} from "nativescript-background-fetch";
 
 + if (application.ios) {
 +  class MyDelegate extends UIResponder {
-+    public static ObjCProtocols = [UIApplicationDelegate];
-      
++    public static ObjCProtocols = [UIApplicationDelegate];      
 +      // BackgroundFetch delegate method
 +      public applicationPerformFetchWithCompletionHandler(application: UIApplication, completionHandler:any) {
-+        TSBackgroundFetch.sharedInstance().performFetchWithCompletionHandler(completionHandler);
++        BackgroundFetch.performFetchWithCompletionHandler(completionHandler);
 +      }
 +    }
 +    application.ios.delegate = MyDelegate;
 +}    
 
 application.start({ moduleName: "main-page" });
-`
 ```
 
 ## Config 
@@ -47,10 +46,11 @@ Set `true` to cease background-fetch from operating after user "closes" the app.
 
 | Method Name | Arguments | Notes
 |---|---|---|
+| `performFetchWithCompletionHandler` | `Function` | This method is **required** to be called in your custom `AppDelegate`, initiated the background-fetch event received from iOS.  See example below. |
 | `configure` | `{config}`, `callbackFn`, `failureFn` | Configures the plugin's fetch `callbackFn`.  This callback will fire each time an iOS background-fetch event occurs (typically every 15 min).  The `failureFn` will be called if the device doesn't support background-fetch. |
 | `finish` | *none* | You **MUST** call this method in your fetch `callbackFn` provided to `#configure` in order to signal to iOS that your fetch action is complete.  iOS provides **only** 30s of background-time for a fetch-event -- if you exceed this 30s, iOS will kill your app. |
-| `start` | `successFn`, `failureFn` | Start the background-fetch API.  Your `callbackFn` provided to `#configure` will be executed each time a background-fetch event occurs.  **NOTE** the `#configure` method *automatically* calls `#start`.  You do **not** have to call this method after you `#configure` the plugin |
-| `stop` | `successFn`, `failureFn` | Stop the background-fetch API from firing fetch events.  Your `callbackFn` provided to `#configure` will no longer be executed. |
+| `start` | [`successFn`], [`failureFn`] | Start the background-fetch API.  Your `callbackFn` provided to `#configure` will be executed each time a background-fetch event occurs.  **NOTE** the `#configure` method *automatically* calls `#start`.  You do **not** have to call this method after you `#configure` the plugin |
+| `stop` | [`successFn`], [`failureFn`] | Stop the background-fetch API from firing fetch events.  Your `callbackFn` provided to `#configure` will no longer be executed. |
 
 ## Example ##
 
@@ -60,21 +60,31 @@ A full example could be:
 import {BackgroundFetch} from "nativescript-background-fetch";
 
 export class HelloWorldModel
-  private _fetchManager: BackgroundFetch;
-
   constructor() {
-    this._fetchManager = new BackgroundFetch();  
-    this._fetchManager.configure({
+    BackgroundFetch.configure({
       stopOnTerminate: false
     }, function() {
       console.log("[js] BackgroundFetch event received");
       //
       // Do stuff.  You have 30s of background-time.
       //
-      // When your job is complete, you must signal completion or iOS can kill your app.
-      this._fetchManager.finish();
+      // When your job is complete, you must signal completion or iOS can kill your app.  Signal the nature of the fetch-event, whether you recevied:
+      // FETCH_RESULT_NEW_DATA: received new data from your server
+      // FETCH_RESULT_NO_DATA: No new data received from your server
+      // FETCH_RESULT_FAILED:  Failed to receive new data.
+      BackgroundFetch.finish(BackgroundFetch.FETCH_RESULT_NEW_DATA);
     }.bind(this), function(error) {
       console.log('BackgroundFetch not supported by your OS');
+    });
+
+    // Later, to stop background-fetch events from firing:
+    BackgroundFetch.stop();
+
+    // Or restart them again:
+    BackgroundFetch.start(function() {
+      console.log("BackgroundFetch successfully started");
+    }, function() {
+      console.log("BackgroundFetch failed to start");
     });
   }
 }
