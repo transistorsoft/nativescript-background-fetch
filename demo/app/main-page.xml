@@ -2,5 +2,12 @@
   <StackLayout>
     <Label text="Background Fetch" class="title"/>
     <Label text="{{ message }}" class="message" textWrap="true"/>
+
+    <StackLayout style="text-align:center;font-size:12;margin-top:20">
+  		<Label text="Simulate background fetch events in XCode with:" />
+    	<Label style="font-weight:bold" text="Debug-&gt;Simulate Background Fetch" />
+  	</StackLayout>
+
   </StackLayout>
+
 </Page>

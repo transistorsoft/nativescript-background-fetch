@@ -1,29 +1,67 @@
 declare var TSBackgroundFetch: any;
 declare var UIBackgroundFetchResultNewData;
+declare var UIBackgroundFetchResultNoData;
+declare var UIBackgroundFetchResultFailed;
 
 let TAG = "NSBackgroundFetch";
 
-export class BackgroundFetch {
-	private fetchManager: any;
-  private configured: boolean;
+var emptyFn = function() {};
 
-  constructor() {
-    
+export class BackgroundFetch {
+  public static FETCH_RESULT_NEW_DATA = 0;
+  public static FETCH_RESULT_NO_DATA = 1;
+  public static FETCH_RESULT_FAILED = 2;
+
+  private static configured: boolean;
+
+  public static performFetchWithCompletionHandler(completionHandler:Function) {
+    TSBackgroundFetch.sharedInstance().performFetchWithCompletionHandler(completionHandler);
   }
-  configure(config, callback:any, failure:any) {
-  	var fetchManager = TSBackgroundFetch.sharedInstance();
+
+  public static configure(config:Object, callback:Function, failure?:Function) {
+    var fetchManager = TSBackgroundFetch.sharedInstance();
     fetchManager.configure(config);
-    
+
     if (fetchManager.start()) {
-        this.configured = true;
-        fetchManager.addListenerCallback(TAG, callback);
+      this.configured = true;
+      fetchManager.addListenerCallback(TAG, callback);
     } else {
-        console.log(TAG, "failed to start TSBackgroundFetch");
+      console.log(TAG, "failed to start TSBackgroundFetch");
+      if (failure) {
         failure();
+      }
     }
   }
-  finish(result) {
-    var fetchManager = TSBackgroundFetch.sharedInstance();
-    fetchManager.finishResult(TAG, UIBackgroundFetchResultNewData);
+  public static start(success?:Function, failure?:Function) {
+    if (TSBackgroundFetch.sharedInstance().start()) {
+      if (success) { success(); }
+    } else {
+      if (failure) { failure();}
+    }
+  }
+
+  public static stop(success?:Function, failure?:Function) {
+    TSBackgroundFetch.sharedInstance().stop();
+    if (success) {
+      success();
+    }
+  }
+
+  public static finish(result?:number) {
+    result = result || BackgroundFetch.FETCH_RESULT_NO_DATA;
+    switch(result) {
+      case 0:
+        result = UIBackgroundFetchResultNewData;
+        break;
+      case 1:
+        result = UIBackgroundFetchResultNoData;
+        break;
+      case 2:
+        result = UIBackgroundFetchResultFailed;
+        break;
+      default:
+        result = UIBackgroundFetchResultNoData;
+    }
+    TSBackgroundFetch.sharedInstance().finishResult(TAG, result);
   }
 }

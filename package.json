@@ -1,42 +1,46 @@
 {
-	"name": "nativescript-background-fetch",
-	"version": "0.0.1",
-	"description": "iOS Background Fetch API Implementation for NativeScript",
-	"main": "background-fetch.js",
-	"nativescript": {
-		"platforms": {
-      "ios": "2.1.1"
-		}
-	},
-	"scripts": {
-		"build": "tsc",
+  "name": "nativescript-background-fetch",
+  "version": "1.0.0",
+  "description": "iOS Background Fetch API Implementation for NativeScript",
+  "main": "background-fetch.js",
+  "typings": "background-fetch.d.ts",
+  "nativescript": {
+    "platforms": {
+      "ios": "2.3.0"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
     "demo.ios": "npm run preparedemo && cd demo && tns emulate ios",
-		"demo.android": "npm run preparedemo && cd demo && tns run android",
-		"preparedemo": "npm run build && cd demo && tns plugin remove nativescript-background-fetch && tns plugin add .. && tns install",
-		"setup": "cd demo && npm install && cd .. && npm run build && cd demo && tns plugin add .. && cd ..",
-    "uninstall": "rm -r ../../lib/iOS/TSBackgroundFetch.framework"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/transistorsoft/nativescript-background-fetch.git"
-	},
-	"keywords": [
-		"NativeScript",
-		"JavaScript",
-		"background fetch",
-		"iOS"
-	],
-	"author": {
-		"name": "Chris Scott, Transistor Software",
-		"email": "chris@transistorsoft.com"
-	},
-	"bugs": {
-		"url": "https://github.com/transistorsoft/nativescript-background-fetch/issues"
-	},
-	"license": "MIT",
-	"homepage": "https://github.com/transistorsoft/nativescript-background-fetch",
-	"readmeFilename": "README.md",
-	"devDependencies": {
-		"typescript": "^1.8.10"
-	}
+    "demo.android": "npm run preparedemo && cd demo && tns run android",
+    "preparedemo": "npm run build && cd demo && tns plugin remove nativescript-background-fetch && tns plugin add .. && tns install",
+    "setup": "cd demo && npm install && cd .. && npm run build && cd demo && tns plugin add .. && cd ..",
+    "uninstall": "rm -r ../../lib/iOS/TSBackgroundFetch.framework",
+    "fix-xcode": "xcproj --project 'demo/platforms/ios/demo.xcodeproj' touch && xcproj --project 'demo/platforms/ios/Pods/Pods.xcodeproj' touch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/transistorsoft/nativescript-background-fetch.git"
+  },
+  "keywords": [
+    "NativeScript",
+    "JavaScript",
+    "background fetch",
+    "iOS"
+  ],
+  "author": {
+    "name": "Chris Scott, Transistor Software",
+    "email": "chris@transistorsoft.com"
+  },
+  "bugs": {
+    "url": "https://github.com/transistorsoft/nativescript-background-fetch/issues"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/transistorsoft/nativescript-background-fetch",
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "tns-platform-declarations": "^2.3.0",
+    "tns-core-modules":"^2.3.0",
+    "typescript": "^1.8.10"
+  }
 }
