@@ -19,21 +19,49 @@ BackgroundFetch requires implementation of the **`AppDelegate`** method **`appli
 
 **`app.ts`**
 ```diff
-import application = require("application");
-import {BackgroundFetch} from "nativescript-background-fetch";
+import * as app from 'application';
 
-+ if (application.ios) {
-+  class MyDelegate extends UIResponder {
-+    public static ObjCProtocols = [UIApplicationDelegate];      
++import {BackgroundFetch} from "nativescript-background-fetch";
+
++if (app.ios) {
++  class MyDelegate extends UIResponder implements UIApplicationDelegate {
++    public static ObjCProtocols = [UIApplicationDelegate];
 +      // BackgroundFetch delegate method
-+      public applicationPerformFetchWithCompletionHandler(application: UIApplication, completionHandler:any) {
++      public applicationPerformFetchWithCompletionHandler(application: any, completionHandler:any) {
 +        BackgroundFetch.performFetchWithCompletionHandler(completionHandler);
 +      }
 +    }
-+    application.ios.delegate = MyDelegate;
-+}    
++    app.ios.delegate = MyDelegate;
++}
 
-application.start({ moduleName: "main-page" });
+app.start({ moduleName: 'main-page' });
+```
+
+**NOTE** If your build fails with the following errors:
+```
+app/app.ts(6,28): error TS2304: Cannot find name 'UIResponder'.
+app/app.ts(6,51): error TS2304: Cannot find name 'UIApplicationDelegate'.
+app/app.ts(7,36): error TS2304: Cannot find name 'UIApplicationDelegate'.
+```
+
+This is because your app hasn't loaded the ios platform-declarations.  You can either load those (if you know how ;)) or simply configure your `tsconfig.json` to ignore errors:
+
+```diff
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es5",
+        "sourceMap": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "noEmitHelpers": true,
++        "noEmitOnError": false
+    },
+    "exclude": [
+        "node_modules",
+        "platforms"
+    ]
+}
 ```
 
 ## Config 
@@ -46,7 +74,7 @@ Set `true` to cease background-fetch from operating after user "closes" the app.
 
 | Method Name | Arguments | Notes
 |---|---|---|
-| `performFetchWithCompletionHandler` | `Function` | This method is **required** to be called in your custom `AppDelegate`, initiated the background-fetch event received from iOS.  See example below. |
+| `performFetchWithCompletionHandler` | `Function` | This method is **required** to be called in your custom `AppDelegate`, initiated the background-fetch event received from iOS.  See [Setup instructions](#setup) above. |
 | `configure` | `{config}`, `callbackFn`, `failureFn` | Configures the plugin's fetch `callbackFn`.  This callback will fire each time an iOS background-fetch event occurs (typically every 15 min).  The `failureFn` will be called if the device doesn't support background-fetch. |
 | `finish` | *none* | You **MUST** call this method in your fetch `callbackFn` provided to `#configure` in order to signal to iOS that your fetch action is complete.  iOS provides **only** 30s of background-time for a fetch-event -- if you exceed this 30s, iOS will kill your app. |
 | `start` | [`successFn`], [`failureFn`] | Start the background-fetch API.  Your `callbackFn` provided to `#configure` will be executed each time a background-fetch event occurs.  **NOTE** the `#configure` method *automatically* calls `#start`.  You do **not** have to call this method after you `#configure` the plugin |
