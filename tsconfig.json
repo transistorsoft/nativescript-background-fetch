@@ -9,12 +9,12 @@
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "noEmitHelpers": true,
-        "noEmitOnError": true
+        "noEmitOnError": false
     },
     "files": [
-        "demo/node_modules/tns-core-modules/tns-core-modules.d.ts",
+        "node_modules/tns-core-modules/tns-core-modules.d.ts",
         "background-fetch.ios.ts",
-	"background-fetch.android.ts"
+        "background-fetch.android.ts"
     ],
     "exclude": [
         "node_modules",
