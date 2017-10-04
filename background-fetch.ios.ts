@@ -1,67 +1,60 @@
 declare var TSBackgroundFetch: any;
-declare var UIBackgroundFetchResultNewData;
-declare var UIBackgroundFetchResultNoData;
-declare var UIBackgroundFetchResultFailed;
 
 let TAG = "NSBackgroundFetch";
 
 var emptyFn = function() {};
 
 export class BackgroundFetch {
-  public static FETCH_RESULT_NEW_DATA = 0;
-  public static FETCH_RESULT_NO_DATA = 1;
-  public static FETCH_RESULT_FAILED = 2;
-
   private static configured: boolean;
 
-  public static performFetchWithCompletionHandler(completionHandler:Function) {
-    TSBackgroundFetch.sharedInstance().performFetchWithCompletionHandler(completionHandler);
+  public static performFetchWithCompletionHandler(application:UIApplication, completionHandler:Function) {
+    TSBackgroundFetch.sharedInstance().performFetchWithCompletionHandlerApplicationState(completionHandler, application.applicationState);
   }
 
   public static configure(config:Object, callback:Function, failure?:Function) {
-    var fetchManager = TSBackgroundFetch.sharedInstance();
-    fetchManager.configure(config);
+    let fetchManager = TSBackgroundFetch.sharedInstance();
 
-    if (fetchManager.start()) {
+    fetchManager.configureCallback(config, (status:UIBackgroundRefreshStatus) => {
+      if (status != UIBackgroundRefreshStatus.Available) {
+        console.warn(TAG, "failed to start TSBackgroundFetch");
+        failure(status);
+        return;
+      }
       this.configured = true;
       fetchManager.addListenerCallback(TAG, callback);
-    } else {
-      console.log(TAG, "failed to start TSBackgroundFetch");
-      if (failure) {
-        failure();
-      }
-    }
+      fetchManager.start();
+    });
   }
   public static start(success?:Function, failure?:Function) {
-    if (TSBackgroundFetch.sharedInstance().start()) {
-      if (success) { success(); }
-    } else {
-      if (failure) { failure();}
-    }
+    success = success || emptyFn;
+    failure = failure || emptyFn;
+
+    TSBackgroundFetch.sharedInstance().start((status:UIBackgroundRefreshStatus) => {
+      if (status == UIBackgroundRefreshStatus.Available) {
+        success();
+      } else {
+        console.warn(TAG, "failed to start TSBackgroundFetch");
+        failure(status);
+      }
+    });
   }
 
   public static stop(success?:Function, failure?:Function) {
+    success = success || emptyFn;
+    failure = failure || emptyFn;
+
     TSBackgroundFetch.sharedInstance().stop();
-    if (success) {
-      success();
-    }
+    success();
   }
 
-  public static finish(result?:number) {
-    result = result || BackgroundFetch.FETCH_RESULT_NO_DATA;
-    switch(result) {
-      case 0:
-        result = UIBackgroundFetchResultNewData;
-        break;
-      case 1:
-        result = UIBackgroundFetchResultNoData;
-        break;
-      case 2:
-        result = UIBackgroundFetchResultFailed;
-        break;
-      default:
-        result = UIBackgroundFetchResultNoData;
-    }
+  public static status(success:Function) {
+    TSBackgroundFetch.sharedInstance().status((status:UIBackgroundRefreshStatus) => {
+      success(status);
+    });
+  }
+
+  public static finish(result?:UIBackgroundFetchResult) {
+    result = result || UIBackgroundFetchResult.NoData;
     TSBackgroundFetch.sharedInstance().finishResult(TAG, result);
   }
 }
