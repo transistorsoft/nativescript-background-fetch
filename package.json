@@ -1,6 +1,6 @@
 {
   "name": "nativescript-background-fetch",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "iOS Background Fetch API Implementation for NativeScript",
   "main": "background-fetch",
   "typings": "background-fetch.d.ts",
