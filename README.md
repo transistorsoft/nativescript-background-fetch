@@ -26,12 +26,12 @@ import * as app from 'application';
 +if (app.ios) {
 +  class MyDelegate extends UIResponder implements UIApplicationDelegate {
 +    public static ObjCProtocols = [UIApplicationDelegate];
-+      // BackgroundFetch delegate method
-+      public applicationPerformFetchWithCompletionHandler(application: any, completionHandler:any) {
-+        BackgroundFetch.performFetchWithCompletionHandler(completionHandler);
-+      }
+
++    public applicationPerformFetchWithCompletionHandler(application: UIApplication, completionHandler:any) {
++      BackgroundFetch.performFetchWithCompletionHandler(application, completionHandler);
 +    }
-+    app.ios.delegate = MyDelegate;
++  }
++  app.ios.delegate = MyDelegate;
 +}
 
 app.start({ moduleName: 'main-page' });
@@ -66,6 +66,10 @@ This is because your app hasn't loaded the ios platform-declarations.  You can e
 
 ## Config 
 
+#### `@param {Integer} minimumFetchInterval [15]`
+
+The minimum interval in **minutes** to execute background fetch events.  Defaults to **`15`** minutes.  **Note**:  Background-fetch events will **never** occur at a frequency higher than **every 15 minutes**.  Apple uses a secret algorithm to adjust the frequency of fetch events, presumably based upon usage patterns of the app.  Fetch events *can* occur less often than your configured `minimumFetchInterval`.
+
 ####`@param {Boolean} stopOnTerminate`
 
 Set `true` to cease background-fetch from operating after user "closes" the app.  Defaults to `true`.
@@ -73,12 +77,13 @@ Set `true` to cease background-fetch from operating after user "closes" the app.
 ## Methods
 
 | Method Name | Arguments | Notes
-|---|---|---|
+|-------------|-----------|---------------------------------------------------|
 | `performFetchWithCompletionHandler` | `Function` | This method is **required** to be called in your custom `AppDelegate`, initiated the background-fetch event received from iOS.  See [Setup instructions](#setup) above. |
-| `configure` | `{config}`, `callbackFn`, `failureFn` | Configures the plugin's fetch `callbackFn`.  This callback will fire each time an iOS background-fetch event occurs (typically every 15 min).  The `failureFn` will be called if the device doesn't support background-fetch. |
-| `finish` | *none* | You **MUST** call this method in your fetch `callbackFn` provided to `#configure` in order to signal to iOS that your fetch action is complete.  iOS provides **only** 30s of background-time for a fetch-event -- if you exceed this 30s, iOS will kill your app. |
-| `start` | [`successFn`], [`failureFn`] | Start the background-fetch API.  Your `callbackFn` provided to `#configure` will be executed each time a background-fetch event occurs.  **NOTE** the `#configure` method *automatically* calls `#start`.  You do **not** have to call this method after you `#configure` the plugin |
-| `stop` | [`successFn`], [`failureFn`] | Stop the background-fetch API from firing fetch events.  Your `callbackFn` provided to `#configure` will no longer be executed. |
+| `configure` | `callbackFn`, `failureFn`, `{config}` | Configures the plugin's fetch `callbackFn`.  This callback will fire each time an iOS background-fetch event occurs (typically every 15 min).  The `failureFn` will be called if the device doesn't support background-fetch. |
+| `finish` | `[UIBackgroundFetchResult]` | You **MUST** call this method in your fetch `callbackFn` provided to `#configure` in order to signal to iOS that your fetch action is complete.  iOS provides **only** 30s of background-time for a fetch-event -- if you exceed this 30s, iOS will kill your app. |
+| `start` | `successFn`, `failureFn` | Start the background-fetch API.  Your `callbackFn` provided to `#configure` will be executed each time a background-fetch event occurs.  **NOTE** the `#configure` method *automatically* calls `#start`.  You do **not** have to call this method after you `#configure` the plugin |
+| `stop` | `successFn`, `failureFn` | Stop the background-fetch API from firing fetch events.  Your `callbackFn` provided to `#configure` will no longer be executed. |
+| `status` | `successFn` | Fetch the `UIBackgroundRefreshStatus` |
 
 ## Example ##
 
@@ -91,21 +96,27 @@ export class HelloWorldModel
   constructor() {
     super();
 
+    // You can query the UIBackgroundRefreshStatus.  User can disable fetch.
+    BackgroundFetch.status((status) => {
+      console.log('- BackgroundFetch status: ', status);
+    });
+
     // Configure Background Fetch
     BackgroundFetch.configure({
-      stopOnTerminate: false
-    }, function() {
+      stopOnTerminate: false,
+      minimumFetchInterval: 30  // minutes
+    }, () => {
       console.log("[js] BackgroundFetch event received");
       //
       // Do stuff.  You have 30s of background-time.
       //
       // When your job is complete, you must signal completion or iOS can kill your app.  Signal the nature of the fetch-event, whether you recevied:
-      // FETCH_RESULT_NEW_DATA: received new data from your server
-      // FETCH_RESULT_NO_DATA: No new data received from your server
-      // FETCH_RESULT_FAILED:  Failed to receive new data.
-      BackgroundFetch.finish(BackgroundFetch.FETCH_RESULT_NEW_DATA);
-    }.bind(this), function(error) {
-      console.log('BackgroundFetch not supported by your OS');
+      // UIBackgroundFetchResult.NewData: Received new data from your server
+      // UIBackgroundFetchResult.NoData:  No new data received from your server
+      // UIBackgroundFetchResult.Failed:  Failed to receive new data.
+      BackgroundFetch.finish(UIBackgroundFetchResult.NewData);
+    }, (status) => {
+      console.log('BackgroundFetch not supported by your OS', status);
     });
 
     // Later, to stop background-fetch events from firing:
@@ -113,10 +124,10 @@ export class HelloWorldModel
 
     // Or restart them again:
     /*
-    BackgroundFetch.start(function() {
+    BackgroundFetch.start(() => {
       console.log("BackgroundFetch successfully started");
-    }, function() {
-      console.log("BackgroundFetch failed to start");
+    }, (status) {
+      console.log("BackgroundFetch failed to start: ", status);
     });
     */
   }
