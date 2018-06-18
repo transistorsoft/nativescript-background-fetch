@@ -2,10 +2,12 @@
 *.js
 *.js.map
 *.log
+package-lock.json
 demo/app/*.js
-demo/*.d.ts
 demo/platforms
 demo/node_modules
+demo/package-lock.json
 demo/lib
 node_modules
 .DS_Store
+
