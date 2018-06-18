@@ -195,7 +195,7 @@ export class HelloWorldModel
 
 - Observe plugin logs in `$ adb logcat`:
 ```bash
-$ adb logcat *:S ReactNative:V ReactNativeJS:V TSBackgroundFetch:V
+$ adb logcat *:S JS:V TSBackgroundFetch:V
 ```
 - Simulate a background-fetch event on a device (insert *&lt;your.application.id&gt;*) (only works for sdk `21+`:
 ```bash
