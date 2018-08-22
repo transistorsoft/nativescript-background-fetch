@@ -34,7 +34,7 @@ import * as app from 'application';
 +    public static ObjCProtocols = [UIApplicationDelegate];
 
 +    public applicationPerformFetchWithCompletionHandler(application: UIApplication, completionHandler:any) {
-+      BackgroundFetch.performFetchWithCompletionHandler(application, completionHandler);
++      BackgroundFetch.performFetchWithCompletionHandler(completionHandler, application.applicationState);
 +    }
 +  }
 +  app.ios.delegate = MyDelegate;
