@@ -1,4 +1,4 @@
-import {BackgroundFetch} from "./background-fetch";
+import HeadlessTask from "./headless-task";
 
 declare var com: any;
 
@@ -11,6 +11,6 @@ class HeadlessBroadcastReceiver extends android.content.BroadcastReceiver {
     if (adapter.isMainActivityActive().booleanValue()) {
       return;
     }
-    BackgroundFetch.invokeHeadlessTask();
+    HeadlessTask.invokeHeadlessTask();
   }
 }

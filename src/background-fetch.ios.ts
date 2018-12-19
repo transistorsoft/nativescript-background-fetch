@@ -50,7 +50,7 @@ export class BackgroundFetch extends AbstractBackgroundFetch {
   }
 
   public static status(success:Function) {
-    TSBackgroundFetch.sharedInstance().status((status:UIBackgroundRefreshStatus) => {      
+    TSBackgroundFetch.sharedInstance().status((status:UIBackgroundRefreshStatus) => {
       success(status);
     });
   }
@@ -62,7 +62,5 @@ export class BackgroundFetch extends AbstractBackgroundFetch {
 
   // Note: Android-only
   public static registerHeadlessTask(callback:Function) {}
-  // Note: Android-only
-  public static invokeHeadlessTask() {}
 
 }

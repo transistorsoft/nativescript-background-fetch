@@ -8,5 +8,4 @@ export declare class BackgroundFetch extends AbstractBackgroundFetch {
     static status(success: Function): void;
     static finish(result?: number): void;
     static registerHeadlessTask(callback: Function): void;
-    static invokeHeadlessTask(): void;
 }

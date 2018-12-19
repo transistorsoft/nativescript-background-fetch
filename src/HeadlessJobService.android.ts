@@ -1,4 +1,4 @@
-import {BackgroundFetch} from "./background-fetch";
+import HeadlessTask from "./headless-task";
 
 declare var com: any;
 let Fetch = com.transistorsoft.tsbackgroundfetch.BackgroundFetch;
@@ -13,9 +13,9 @@ class HeadlessJobService extends android.app.job.JobService {
         this.jobFinished(params, false);
       }
     }));
-    if (!BackgroundFetch.invokeHeadlessTask()) {
+    if (!HeadlessTask.invokeHeadlessTask()) {
       this.jobFinished(params, false);
-    }   
+    }
     return true;
   }
 
