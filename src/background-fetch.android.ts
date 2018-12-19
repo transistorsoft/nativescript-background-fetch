@@ -1,13 +1,18 @@
 // importing this solves issues with __awaiter not defined using await in Android HeadlessTask
 import 'nativescript-tslib';
 
+import "./HeadlessBroadcastReceiver";
+import "./HeadlessJobService";
+
 import {AbstractBackgroundFetch} from "./common";
+import HeadlessTask from "./headless-task";
+
+declare var com: any;
 
 var emptyFn = function() {};
 
 import app = require('application');
 
-declare var com: any;
 
 let Fetch = com.transistorsoft.tsbackgroundfetch.BackgroundFetch;
 let FetchConfig = com.transistorsoft.tsbackgroundfetch.BackgroundFetchConfig
@@ -17,19 +22,8 @@ export class BackgroundFetch extends AbstractBackgroundFetch {
   private static isForceReload:boolean = false;
   private static intent:android.content.Intent;
 
-  private static headlessTask: Function;
-
-  public static registerHeadlessTask(callback:Function) {    
-    this.headlessTask = callback;
-  }
-
-  public static invokeHeadlessTask():boolean {    
-    if (!this.headlessTask) {
-      console.log('[BackgroundFetch] invokeHeadlessTask ERROR - headlessTask is null.  Did you BackgroundFetch.registerHeadlessTask(myTask) in your app.ts?');
-      return false;
-    }
-    this.headlessTask();
-    return true;
+  public static registerHeadlessTask(callback:Function) {
+    HeadlessTask.registerHeadlessTask(callback);
   }
 
   public static configure(params:any, success:Function, failure?:Function) {
@@ -69,17 +63,17 @@ export class BackgroundFetch extends AbstractBackgroundFetch {
     success = success || emptyFn;
     let adapter = this.getAdapter();
     adapter.stop();
-    success(); 
+    success();
   }
   public static finish(result?:number) {
     let adapter = this.getAdapter();
     adapter.finish();
-  } 
+  }
   public static status(success:Function) {}
 
   private static init() {
-    if (!app.android.startActivity || (this.intent !== null)) { 
-      return; 
+    if (!app.android.startActivity || (this.intent !== null)) {
+      return;
     }
     this.intent = app.android.startActivity.getIntent();
     let action = this.intent.getAction();
