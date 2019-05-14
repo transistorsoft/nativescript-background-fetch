@@ -11,7 +11,7 @@ Background Fetch is a *very* simple plugin which will awaken an app in the backg
 
 There is **no way** to increase the rate which a fetch-event occurs and this plugin sets the rate to the most frequent possible &mdash; you will **never** receive an event faster than **15 minutes**.  The operating-system will automatically throttle the rate the background-fetch events occur based upon usage patterns.  Eg: if user hasn't turned on their phone for a long period of time, fetch events will occur less frequently.
 
-The Android plugin provides a "Headless"]() implementation allowing you to continue handling events with Javascript even after app-termination (see **[`@config enableHeadless`](#config-boolean-enableheadless-false)**)
+The Android plugin provides a "Headless" implementation allowing you to continue handling events with Javascript even after app-termination (see **[`@config enableHeadless`](#config-boolean-enableheadless-false)**)
 
 ## Installing the plugin ##
 
